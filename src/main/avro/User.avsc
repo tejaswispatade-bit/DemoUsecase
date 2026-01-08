@@ -1,0 +1,68 @@
+{
+    "name": "User",
+    "namespace": "com.kafka.DemoUsecase.avro.User",
+    "type": "record",
+    "fields": [
+        {
+            "name": "user_id",
+            "type": "int"
+        },
+        {
+            "name": "personal_details",
+            "type":
+                {
+                    "name": "personal_details",
+                    "type": "record",
+                    "fields": [
+                        {
+                            "name": "first_name",
+                            "type": "string"
+
+                        },
+                        {
+                            "name": "last_name",
+                            "type": "string"
+                           
+                        },
+                        {
+                            "name": "date_of_birth",
+                            "type": "string"
+                         
+                        }
+                    ]
+                }
+
+        },
+        {
+            "name": "contact",
+            "type":
+                {
+                    "name": "contact",
+                    "type": "record",
+                    "fields": [
+                        {
+                            "name": "email",
+                            "type": "string"
+
+                        },
+                        {
+                            "name": "phone",
+                            "type": "string"
+                           
+                        }
+                    ]
+                }
+
+        },
+        {
+            "name": "status",
+            "type": "string"
+          
+        },
+        {
+            "name": "department",
+            "type": "string"
+
+        }
+    ]
+}

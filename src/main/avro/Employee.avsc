@@ -1,0 +1,60 @@
+{
+    "name": "Employee",
+    "namespace": "com.kafka.DemoUsecase.avro.Employee",
+    "type": "record",
+    "fields": [
+        {
+            "name": "employee_id",
+            "type": "string"
+
+        },
+        {
+            "name": "full_name",
+            "type": "string"
+
+        },
+        {
+            "name": "department_name",
+            "type": "string"
+
+        },
+        {
+            "name": "work_email",
+            "type": "string"
+
+        },
+        {
+            "name": "employment_status",
+            "type": "string"
+
+        },
+        {
+            "name": "hire_date",
+            "type": [
+                "null"
+            ],
+            "default": null
+        },
+        {
+            "name": "salary_details",
+            "type": 
+                {
+                    "name": "salary_details",
+                    "type": "record",
+                    "fields": [
+                        {
+                            "name": "base_salary",
+                            "type": "int"
+                  
+                        },
+                        {
+                            "name": "currency",
+                            "type": "string"
+
+                        }
+                    ]
+                }
+
+        }
+    ]
+}
