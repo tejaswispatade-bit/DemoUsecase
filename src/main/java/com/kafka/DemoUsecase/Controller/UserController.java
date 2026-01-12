@@ -21,7 +21,7 @@ public class UserController {
     @PostMapping("/publish")
     public String publishUser() throws Exception {
         producer.registerSchema();
-        consumer.registerSchemaConsumer();
+        //consumer.registerSchemaConsumer();
         return "Event published";
     }
 }

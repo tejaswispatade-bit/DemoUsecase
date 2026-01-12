@@ -1,34 +1,53 @@
 package com.kafka.DemoUsecase.Consumer;
 
-
 import com.kafka.DemoUsecase.avro.Employee.Employee;
-import com.kafka.DemoUsecase.avro.Employee.salary_details;
-import org.springframework.kafka.core.KafkaTemplate;
+import com.kafka.DemoUsecase.db.entity.EmployeeEntity;
+import com.kafka.DemoUsecase.db.repository.EmployeeRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
 @Service
-public class EmployeeConsumer {
-    private final KafkaTemplate<String, Object> kafkaTemplate;
+@Slf4j
 
-    public EmployeeConsumer(KafkaTemplate<String, Object> kafkaTemplate) {
-        this.kafkaTemplate = kafkaTemplate;
+public class EmployeeConsumer {
+
+    private final EmployeeRepository repository;
+
+    public EmployeeConsumer(EmployeeRepository repository) {
+        this.repository = repository;
     }
-    public void registerSchemaConsumer() {
-        salary_details sal = salary_details.newBuilder()
-                .setBaseSalary(60000)
-                .setCurrency("USD").build();
-        Employee emp = Employee.newBuilder()
-                .setEmployeeId("101")
-                .setDepartmentName("Engineering")
-                .setFullName("John Doe")
-                .setWorkEmail("john.doe@example.com")
-                .setEmploymentStatus("Active")
-                .setHireDate(null)
-                .setSalaryDetails(sal)
+    @KafkaListener(
+            topics = "Employee",
+            groupId = "employee-db-group"
+    )
+    public void consume(Employee employee) {
+
+        log.info("Received Employee from Kafka: {}", employee);
+
+        // Prevent duplicate inserts
+        repository.findByEmployeeId(employee.getEmployeeId().toString())
+                .ifPresentOrElse(
+                        e -> log.warn("Employee already exists: {}", employee.getEmployeeId()),
+                        () -> saveEmployee(employee)
+                );
+    }
+
+    private void saveEmployee(Employee employee) {
+
+        EmployeeEntity entity = EmployeeEntity.builder()
+                .employeeId(employee.getEmployeeId().toString())
+                .fullName(employee.getFullName().toString())
+                .departmentName(employee.getDepartmentName().toString())
+                .workEmail(employee.getWorkEmail().toString())
+                .employmentStatus(employee.getEmploymentStatus().toString())
+                .hireDate(null)
+                .baseSalary(employee.getSalaryDetails().getBaseSalary())
+                .currency(employee.getSalaryDetails().getCurrency().toString())
                 .build();
 
-        System.out.println(">>> Sending User message");
-        // THIS ONE LINE registers schema automatically
-        kafkaTemplate.send("Employee",emp);
+        repository.save(entity);
+        log.info("Employee saved to DB: {}", entity.getEmployeeId());
     }
 }
