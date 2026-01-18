@@ -3,6 +3,7 @@ package com.kafka.DemoUsecase.Producer;
 import com.kafka.DemoUsecase.avro.User.User;
 import com.kafka.DemoUsecase.avro.User.contact;
 import com.kafka.DemoUsecase.avro.User.personal_details;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +14,9 @@ public class UserProducer {
 
     private final KafkaTemplate<String, User> kafkaTemplate;
 
-    public UserProducer(KafkaTemplate<String, User> kafkaTemplate) {
+    public UserProducer(
+            @Qualifier("userKafkaTemplate")
+            KafkaTemplate<String, User> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
     }
 
@@ -21,17 +24,17 @@ public class UserProducer {
         System.out.println("Inside UserProducer");
 
         contact con = contact.newBuilder()
-                .setEmail("ron.joe@example.com")
-                .setPhone("123-889-0045")
+                .setEmail("rahul.rai@example.com")
+                .setPhone("9876368190")
                 .build();
 
         personal_details details = personal_details.newBuilder()
-                .setFirstName("Ron")
-                .setLastName("Joe")
+                .setFirstName("Rahul")
+                .setLastName("Rai")
                 .setDateOfBirth("1992-02-15")
                 .build();
 
-        User user = User.newBuilder().setUserId(103)
+        User user = User.newBuilder().setUserId(105)
                 .setContact(con)
                 .setPersonalDetails(details)
                 .setDepartment("Engineering")

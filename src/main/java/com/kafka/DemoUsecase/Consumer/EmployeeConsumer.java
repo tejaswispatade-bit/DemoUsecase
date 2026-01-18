@@ -6,6 +6,7 @@ import com.kafka.DemoUsecase.db.repository.EmployeeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,18 +21,25 @@ public class EmployeeConsumer {
     }
     @KafkaListener(
             topics = "Employee",
-            groupId = "employee-db-group"
+            groupId = "employee-db-group",
+            containerFactory = "kafkaListenerContainerFactory"
     )
-    public void consume(Employee employee) {
 
-        log.info("Received Employee from Kafka: {}", employee);
+    public void consume(Employee employee, Acknowledgment ack) {
+try {
+    log.info("Received Employee from Kafka: {}", employee);
 
-        // Prevent duplicate inserts
-        repository.findByEmployeeId(employee.getEmployeeId().toString())
-                .ifPresentOrElse(
-                        e -> log.warn("Employee already exists: {}", employee.getEmployeeId()),
-                        () -> saveEmployee(employee)
-                );
+    // Prevent duplicate inserts
+    repository.findByEmployeeId(employee.getEmployeeId().toString())
+            .ifPresentOrElse(
+                    e -> log.warn("Employee already exists: {}", employee.getEmployeeId()),
+                    () -> saveEmployee(employee)
+            );
+    ack.acknowledge();
+
+} catch (Exception e) {
+    throw new RuntimeException(e);
+}
     }
 
     private void saveEmployee(Employee employee) {
